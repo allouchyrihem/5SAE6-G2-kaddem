@@ -14,7 +14,7 @@ pipeline {
             steps {
                 script {
                     echo "Checking out the repository..."
-                    git url: 'https://github.com/allouchyrihem/5SAE6-G2-kaddem/.git', branch: 'islem-abderahmen', credentialsId: "${env.GITHUB_CREDENTIALS_ID}"
+                    git url: 'https://github.com/allouchyrihem/5SAE6-G2-kaddem.git', branch: 'islem-abderahmen', credentialsId: "${env.GITHUB_CREDENTIALS_ID}"
                 }
             }
         }
