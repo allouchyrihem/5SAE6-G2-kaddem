@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mysqldb:
+    container_name: mysqldb
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root           # Set the root user password
+      MYSQL_DATABASE: kaddem
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - networkmysql
+
+  springboot-app:
+    image: islem997/islemabderahmen_g2_kaddem
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8089:8089"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/kaddem
+      SPRING_DATASOURCE_USERNAME: root          # Use root for DB access
+      SPRING_DATASOURCE_PASSWORD: root          # Use root password
+    depends_on:
+      - mysqldb
+    networks:
+      - networkmysql
+
+networks:
+  networkmysql:
+    driver: bridge
+
+volumes:
+  mysql-data:
