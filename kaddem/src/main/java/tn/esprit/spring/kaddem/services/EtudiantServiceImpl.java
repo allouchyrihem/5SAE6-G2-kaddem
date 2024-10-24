@@ -41,8 +41,8 @@ public class EtudiantServiceImpl implements IEtudiantService{
 		return etudiantRepository.save(e);
 	}
 
-	public Etudiant retrieveEtudiant(Integer  idEtudiant){
-		return etudiantRepository.findById(idEtudiant).get();
+	public Etudiant retrieveEtudiant(Integer idEtudiant) {
+		return etudiantRepository.findById(idEtudiant).orElse(null);
 	}
 
 	public void removeEtudiant(Integer idEtudiant){
@@ -50,19 +50,29 @@ public class EtudiantServiceImpl implements IEtudiantService{
 	etudiantRepository.delete(e);
 	}
 
-	public void assignEtudiantToDepartement (Integer etudiantId, Integer departementId){
-        Etudiant etudiant = etudiantRepository.findById(etudiantId).orElse(null);
-        Departement departement = departementRepository.findById(departementId).orElse(null);
-        etudiant.setDepartement(departement);
-        etudiantRepository.save(etudiant);
+	public void assignEtudiantToDepartement(Integer etudiantId, Integer departementId) {
+		Etudiant etudiant = etudiantRepository.findById(etudiantId).orElse(null);
+		Departement departement = departementRepository.findById(departementId).orElse(null);
+
+		if (etudiant != null && departement != null) {
+			etudiant.setDepartement(departement);
+			etudiantRepository.save(etudiant);
+		}
 	}
+
 	@Transactional
-	public Etudiant addAndAssignEtudiantToEquipeAndContract(Etudiant e, Integer idContrat, Integer idEquipe){
-		Contrat c=contratRepository.findById(idContrat).orElse(null);
-		Equipe eq=equipeRepository.findById(idEquipe).orElse(null);
-		c.setEtudiant(e);
-		eq.getEtudiants().add(e);
-return e;
+	public Etudiant addAndAssignEtudiantToEquipeAndContract(Etudiant e, Integer idContrat, Integer idEquipe) {
+		Contrat c = contratRepository.findById(idContrat).orElse(null);
+		Equipe eq = equipeRepository.findById(idEquipe).orElse(null);
+
+		if (c != null && eq != null) {
+			c.setEtudiant(e);
+			eq.getEtudiants().add(e);
+			contratRepository.save(c);
+			equipeRepository.save(eq);
+		}
+
+		return e;
 	}
 
 	public 	List<Etudiant> getEtudiantsByDepartement (Integer idDepartement){
