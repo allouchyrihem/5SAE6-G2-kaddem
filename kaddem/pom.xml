@@ -56,8 +56,6 @@
             <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- Dépendance pour Mockito -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -65,6 +63,14 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>deploymentRepo</id>
+            <name>Nexus Repository</name>
+            <url>http://localhost:8081/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
 
     <build>
         <plugins>
@@ -87,6 +93,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>
