@@ -20,6 +20,7 @@ public class EquipeRestController {
 		List<Equipe> listEquipes = equipeService.retrieveAllEquipes();
 		return listEquipes;
 	}
+	//chelsea
 	// http://localhost:8089/Kaddem/equipe/retrieve-equipe/8
 	@GetMapping("/retrieve-equipe/{equipe-id}")
 	public Equipe retrieveEquipe(@PathVariable("equipe-id") Integer equipeId) {
