@@ -44,7 +44,7 @@ pipeline {
             }
         }
 
-        stage('Unit Tests') {
+        stage('Unit Tests/Mockito') {
             steps {
                 script {
                     echo 'Running unit tests...'
@@ -69,6 +69,17 @@ pipeline {
                  }
              }
          }
+          // Add the Nexus deployment stage
+                 stage('Deploy to Nexus') {
+                     steps {
+                         script {
+                             echo 'Deploying artifact to Nexus...'
+                             withMaven(maven: 'Maven') {
+                                 sh 'mvn deploy -Dmaven.test.skip=true' // Skips tests during deploy
+                             }
+                         }
+                     }
+                 }
 
         stage('Building Docker Image') {
             steps {

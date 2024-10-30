@@ -32,9 +32,21 @@ services:
     networks:
       - networkmysql
 
+  nexus:
+    image: sonatype/nexus3
+    container_name: nexus
+    restart: always
+    ports:
+      - "8081:8081"
+    volumes:
+      - nexus-data:/nexus-data
+    networks:
+      - networkmysql
+
 networks:
   networkmysql:
     driver: bridge
 
 volumes:
   mysql-data:
+  nexus-data:  # Add this line to create a volume for Nexus
