@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     container_name: mysqldb
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_DATABASE: db
 
     ports:
