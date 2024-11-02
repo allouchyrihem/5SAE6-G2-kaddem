@@ -11,4 +11,4 @@ COPY target/kaddem-0.0.1.jar kaddem.jar
 EXPOSE 8089
 
 # Specify the command to run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "kaddem.jar"]
