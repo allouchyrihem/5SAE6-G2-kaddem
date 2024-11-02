@@ -109,5 +109,16 @@
 
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>nexus-repo</id>
+            <url>http://votre_nexus_url/repository/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-repo</id>
+            <url>http://votre_nexus_url/repository/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 
 </project>
