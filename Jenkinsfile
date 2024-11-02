@@ -5,7 +5,8 @@ pipeline {
         GITHUB_CREDENTIALS_ID = 'islem_github'
         DOCKERHUB_CREDENTIALS_ID = 'dockerhub_credentials_islem' // Ajoutez vos identifiants DockerHub ici
         EMAIL_RECIPIENT = 'abderahmenislem052@gmail.com'
-                EMAIL_SUBJECT = 'Statut du Build Jenkins'
+        EMAIL_SUBJECT = 'Statut du Build Jenkins'
+        NEXUS_CREDENTIALS_ID = 'nexus_credentials_id'
     }
 
     tools {
@@ -70,16 +71,15 @@ pipeline {
              }
          }
           // Add the Nexus deployment stage
-                 stage('Deploy to Nexus') {
-                     steps {
-                         script {
-                             echo 'Deploying artifact to Nexus...'
-                             withMaven(maven: 'Maven') {
-                                 sh 'mvn deploy -Dmaven.test.skip=true' // Skips tests during deploy
-                             }
-                         }
-                     }
-                 }
+                stage('Publish to Nexus') {
+            steps {
+                script {
+                    echo "Publishing the artifact to Nexus repository..."
+                    sh 'mvn deploy -Dmaven.test.skip=true --settings /usr/share/maven/conf/settings.xml'
+                }
+            }
+        }
+    
 
         stage('Building Docker Image') {
             steps {
