@@ -48,7 +48,18 @@
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>1.6.9</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>4.8.0</version> <!-- Utilise la version la plus récente -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.2</version> <!-- Utilise la version la plus récente -->
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
