@@ -5,13 +5,10 @@ import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import tn.esprit.spring.kaddem.entities.Contrat;
 import tn.esprit.spring.kaddem.entities.Departement;
 import tn.esprit.spring.kaddem.entities.Etudiant;
@@ -25,9 +22,9 @@ import tn.esprit.spring.kaddem.services.EtudiantServiceImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
+
 public class KaddemApplicationTest {
+
     @InjectMocks
     private EtudiantServiceImpl etudiantService;
 
@@ -51,6 +48,8 @@ public class KaddemApplicationTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        // Initialize entities
         etudiant = new Etudiant();
         etudiant.setIdEtudiant(1);
         etudiant.setNomE("John");
@@ -64,13 +63,18 @@ public class KaddemApplicationTest {
 
         departement = new Departement();
         departement.setIdDepart(1);
+
+        // Common mock behavior
+        when(etudiantRepository.findById(1)).thenReturn(Optional.of(etudiant));
+        when(departementRepository.findById(1)).thenReturn(Optional.of(departement));
+        when(contratRepository.findById(1)).thenReturn(Optional.of(contrat));
+        when(equipeRepository.findById(1)).thenReturn(Optional.of(equipe));
     }
 
     @Test
     public void testRetrieveAllEtudiants() {
         List<Etudiant> etudiants = new ArrayList<>();
         etudiants.add(etudiant);
-
         when(etudiantRepository.findAll()).thenReturn(etudiants);
 
         List<Etudiant> result = etudiantService.retrieveAllEtudiants();
@@ -85,6 +89,7 @@ public class KaddemApplicationTest {
         Etudiant result = etudiantService.addEtudiant(etudiant);
         assertNotNull(result);
         assertEquals("John", result.getNomE());
+        verify(etudiantRepository, times(1)).save(etudiant);
     }
 
     @Test
@@ -94,15 +99,15 @@ public class KaddemApplicationTest {
         Etudiant result = etudiantService.updateEtudiant(etudiant);
         assertNotNull(result);
         assertEquals("John", result.getNomE());
+        verify(etudiantRepository, times(1)).save(etudiant);
     }
 
     @Test
     public void testRetrieveEtudiant() {
-        when(etudiantRepository.findById(1)).thenReturn(Optional.of(etudiant));
-
         Etudiant result = etudiantService.retrieveEtudiant(1);
         assertNotNull(result);
         assertEquals("John", result.getNomE());
+        verify(etudiantRepository, times(1)).findById(1);
     }
 
     @Test
@@ -111,22 +116,17 @@ public class KaddemApplicationTest {
 
         Etudiant result = etudiantService.retrieveEtudiant(1);
         assertNull(result);
+        verify(etudiantRepository, times(1)).findById(1);
     }
 
     @Test
     public void testRemoveEtudiant() {
-        when(etudiantRepository.findById(1)).thenReturn(Optional.of(etudiant));
-        doNothing().when(etudiantRepository).delete(any(Etudiant.class));
-
         etudiantService.removeEtudiant(1);
         verify(etudiantRepository, times(1)).delete(etudiant);
     }
 
     @Test
     public void testAssignEtudiantToDepartement() {
-        when(etudiantRepository.findById(1)).thenReturn(Optional.of(etudiant));
-        when(departementRepository.findById(1)).thenReturn(Optional.of(departement));
-
         etudiantService.assignEtudiantToDepartement(1, 1);
         assertEquals(departement, etudiant.getDepartement());
         verify(etudiantRepository, times(1)).save(etudiant);
@@ -135,18 +135,13 @@ public class KaddemApplicationTest {
     @Test
     public void testAssignEtudiantToDepartementEtudiantNotFound() {
         when(etudiantRepository.findById(1)).thenReturn(Optional.empty());
-        when(departementRepository.findById(1)).thenReturn(Optional.of(departement));
 
         etudiantService.assignEtudiantToDepartement(1, 1);
-        assertNull(etudiant.getDepartement());
         verify(etudiantRepository, never()).save(etudiant);
     }
 
     @Test
     public void testAddAndAssignEtudiantToEquipeAndContract() {
-        when(contratRepository.findById(1)).thenReturn(Optional.of(contrat));
-        when(equipeRepository.findById(1)).thenReturn(Optional.of(equipe));
-
         Etudiant result = etudiantService.addAndAssignEtudiantToEquipeAndContract(etudiant, 1, 1);
         assertNotNull(result);
         assertEquals(etudiant, result);
@@ -158,7 +153,6 @@ public class KaddemApplicationTest {
     public void testGetEtudiantsByDepartement() {
         List<Etudiant> etudiants = new ArrayList<>();
         etudiants.add(etudiant);
-
         when(etudiantRepository.findEtudiantsByDepartement_IdDepart(1)).thenReturn(etudiants);
 
         List<Etudiant> result = etudiantService.getEtudiantsByDepartement(1);
