@@ -6,7 +6,7 @@ services:
     image: mysql:5.7
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root           # Set the root user password
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"        # Set the root user password
       MYSQL_DATABASE: kaddem
     ports:
       - "3306:3306"
