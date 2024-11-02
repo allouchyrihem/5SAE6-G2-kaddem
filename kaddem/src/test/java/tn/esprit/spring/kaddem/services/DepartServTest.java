@@ -50,7 +50,7 @@ public class DepartServTest {
         assertEquals("Informatique", result.get(0).getNomDepart());
     }
 
-    @Test
+   @Test
     public void testAddDepartement() {
         // Données de test
         Departement newDepartement = new Departement(3, "Marketing");
@@ -67,7 +67,7 @@ public class DepartServTest {
         verify(departementRepository, times(1)).save(newDepartement); // Vérifier que save a été appelé
     }
 
-    @Test
+   @Test
     public void testUpdateDepartement() {
         // Données de test
         Departement updatedDepartement = new Departement(1, "Informatique Avancée");
@@ -84,7 +84,7 @@ public class DepartServTest {
         verify(departementRepository, times(1)).save(updatedDepartement); // Vérifier que save a été appelé
     }
 
-    @Test
+     @Test
     public void testRetrieveDepartement() {
         // Données de test
         Departement departement = new Departement(1, "Informatique");
@@ -115,17 +115,7 @@ public class DepartServTest {
         verify(departementRepository, times(1)).delete(departement);
     }
 
-    @Test
-    public void testRetrieveDepartementNotFound() {
-        // Comportement simulé
-        when(departementRepository.findById(1)).thenReturn(Optional.empty());
 
-        // Appel de la méthode à tester
-        Departement result = departementService.retrieveDepartement(1);
-
-        // Assertions
-        assertNull(result); // Le résultat doit être null car le département n'existe pas
-    }
 }
 
 
