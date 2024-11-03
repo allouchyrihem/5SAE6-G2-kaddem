@@ -10,7 +10,7 @@
     </parent>
     <groupId>tn.esprit.spring</groupId>
     <artifactId>kaddem</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <name>kaddem</name>
     <description>kaddem</description>
     <properties>
@@ -90,11 +90,7 @@
     </build>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>snapshot-repo</id>
-            <name>Nexus Snapshot Repository</name>
-            <url>http://192.168.56.10:8081/repository/maven-snapshots/</url>
-        </snapshotRepository>
+
         <repository>
             <id>nexus-repo</id>
             <name>Nexus Repository</name>
