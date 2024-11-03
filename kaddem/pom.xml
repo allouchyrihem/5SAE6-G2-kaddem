@@ -47,8 +47,9 @@
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
-                <version>3.9.1</version> <!-- Version stable -->
+                <version>3.9.0.2155</version> <!-- Ou une autre version stable -->
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -72,27 +73,32 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.sonarsource.scanner.maven</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-                <version>3.9.0.2155</version> <!-- Une version alternative à essayer -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>tn.esprit.spring.kaddem.KaddemApplication</mainClass> <!-- Remplacez par votre classe principale -->
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
-
         </plugins>
     </build>
 
     <distributionManagement>
-        <repository>
-            <id>nexus-repo</id>
-            <url>http://votre_nexus_url/repository/releases/</url>
-        </repository>
-        <snapshotRepository>
+            <repository>
+                <id>deploymentRepo</id>
+                <name>Nexus Repository</name>
+                <url>http://192.168.56.10:8081/repository/maven-releases/</url>
+            </repository>
 
-                <id>nexus-repo</id>
-                <url>http://localhost:8081/repository/snapshots/</url>
-
-
-        </snapshotRepository>
     </distributionManagement>
+
+
 
     <repositories>
         <repository>
@@ -100,12 +106,8 @@
             <url>https://repo.maven.apache.org/maven2</url>
         </repository>
         <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>sonatype-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <id>sonarsource</id>
+            <url>https://repo.sonarsource.com/public</url>
         </repository>
     </repositories>
 
