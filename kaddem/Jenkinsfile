@@ -6,7 +6,7 @@ pipeline {
         SONAR_LOGIN = 'admin'
         SONAR_PASSWORD = 'Minette1+aze'
         DOCKERHUB_CREDENTIALS_ID = 'rihem_hub' // Replace with your actual credentials ID in Jenkins
-
+        EMAIL_RECIPIENTS = 'rihem.allouchi@esprit.tn'
     }
 
     stages {
@@ -104,15 +104,27 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            echo 'Pipeline completed.'
+    stage('Mail') {
+                steps {
+                    script {
+                        def subject = currentBuild.result == 'SUCCESS' ? "Pipeline Succeeded: ${currentBuild.fullDisplayName}" : "Pipeline Failed: ${currentBuild.fullDisplayName}"
+                        def body = currentBuild.result == 'SUCCESS' ?
+                            "The pipeline has succeeded. You can check the details at ${env.BUILD_URL}" :
+                            "The pipeline has failed. Please check the logs at ${env.BUILD_URL}"
+
+                        emailext(
+                            to: EMAIL_RECIPIENTS,
+                            subject: subject,
+                            body: body
+                        )
+                    }
+                }
+            }
         }
-        success {
-            echo 'Pipeline succeeded.'
-        }
-        failure {
-            echo 'Pipeline failed.'
+
+        post {
+            always {
+                echo 'Pipeline completed.'
+            }
         }
     }
-}
