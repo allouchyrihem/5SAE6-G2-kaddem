@@ -6,35 +6,34 @@ pipeline {
         SONAR_LOGIN = 'admin'
         SONAR_PASSWORD = 'Minette1+aze'
         DOCKERHUB_CREDENTIALS_ID = 'rihem_hub' // Replace with your actual credentials ID in Jenkins
+
     }
 
     stages {
         stage('Checkout GIT') {
             steps {
                 echo 'Pulling the repository...'
-                git branch: 'rihem_etudiantBranch', url: 'https://github.com/allouchyrihem/5SAE6-G2-kaddem.git'
+                git(
+                    branch: 'rihem_etudiantBranch',
+                    url: 'https://github.com/allouchyrihem/5SAE6-G2-kaddem.git'
+                )
+
                 echo 'Latest commit information:'
                 sh 'git log -1'
             }
         }
 
-        stage('Build & Test with Maven') {
+        stage('Build with Maven') {
             steps {
                 dir('kaddem') {
-                    echo 'Running Maven build and tests...'
-                    sh 'mvn clean install'
-                    echo 'Build and test completed'
+                    echo 'Starting Maven compile...'
+                    sh 'mvn clean compile'
+                    echo 'Maven compile completed'
                 }
             }
         }
 
         stage('SonarQube Analysis') {
-            when {
-                expression {
-                    // Run SonarQube only if certain files (like Java or pom.xml) are changed
-                    return sh(script: "git diff --name-only HEAD^ | grep -E '\\.(java|xml)$'", returnStatus: true) == 0
-                }
-            }
             steps {
                 dir('kaddem') {
                     echo 'Starting SonarQube analysis...'
@@ -49,6 +48,16 @@ pipeline {
             }
         }
 
+        stage('JUnit & Mockito Tests') {
+            steps {
+                dir('kaddem') {
+                    echo 'Running unit tests with JUnit and Mockito...'
+                    sh 'mvn test'
+                    echo 'Unit tests completed'
+                }
+            }
+        }
+
         stage('Nexus Deployment') {
             steps {
                 dir('kaddem') {
@@ -58,36 +67,38 @@ pipeline {
                 }
             }
         }
-
-        stage('Build & Push Docker Image') {
+        stage('Building Image') {
             steps {
                 dir('kaddem') {
                     script {
                         echo 'Building Docker image...'
                         sh 'docker build -t rihemhub/allouchirihem_kaddem:1.0.0 .'
-                        echo 'Logging into DockerHub and pushing image...'
-                        withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS_ID, usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                            sh '''
-                                docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
-                                docker push rihemhub/allouchirihem_kaddem:1.0.0
-                            '''
-                        }
-                        echo 'Docker image pushed to DockerHub successfully!'
                     }
                 }
             }
         }
-
-        stage('Deploy with Docker Compose') {
-            when {
-                // Only run Docker Compose deployment if Docker image build and push were successful
-                expression { return currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+        stage('Push Docker Image to DockerHub') {
+            steps {
+                script {
+                    echo 'Pushing Docker image to DockerHub...'
+                    // Use Jenkins credentials to login to DockerHub
+                    withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS_ID, usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        sh '''
+                            docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
+                            docker push rihemhub/allouchirihem_kaddem:1.0.0
+                        '''
+                    }
+                    echo 'Docker image pushed to DockerHub successfully!'
+                }
             }
+        }
+        stage('Deploy with Docker Compose') {
             steps {
                 dir('kaddem') {
-                    echo 'Deploying application using Docker Compose...'
-                    sh 'docker-compose up -d --build'
-                    echo 'Application deployed successfully!'
+                    script {
+                        echo 'Deploying application using Docker Compose...'
+                        sh 'docker-compose up -d'
+                    }
                 }
             }
         }
