@@ -38,12 +38,12 @@ pipeline {
             steps {
                 dir('kaddem') {
                     echo 'Starting SonarQube analysis...'
-                    sh """
+                    sh '''
                         mvn sonar:sonar \
-                        -Dsonar.login=${SONAR_LOGIN} \
-                        -Dsonar.password=${SONAR_PASSWORD} \
-                        -Dsonar.host.url=${SONAR_HOST_URL}
-                    """
+                        -Dsonar.login=$SONAR_LOGIN \
+                        -Dsonar.password=$SONAR_PASSWORD \
+                        -Dsonar.host.url=$SONAR_HOST_URL
+                    '''
                     echo 'SonarQube analysis completed'
                 }
             }
