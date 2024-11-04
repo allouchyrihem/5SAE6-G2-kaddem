@@ -1,0 +1,116 @@
+pipeline {
+    agent any
+
+    environment {
+        SONAR_HOST_URL = 'http://192.168.1.13:9000'
+        SONAR_LOGIN = 'admin'
+        SONAR_PASSWORD = 'Minette1+aze'
+        DOCKERHUB_CREDENTIALS_ID = 'rihem_hub' // Replace with your actual credentials ID in Jenkins
+    }
+
+    stages {
+        stage('Checkout GIT') {
+            steps {
+                echo 'Pulling the repository...'
+                git(
+                    branch: 'rihem_etudiantBranch',
+                    url: 'https://github.com/allouchyrihem/5SAE6-G2-kaddem.git'
+                )
+
+                echo 'Latest commit information:'
+                sh 'git log -1'
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                dir('kaddem') {
+                    echo 'Starting Maven compile...'
+                    sh 'mvn clean compile'
+                    echo 'Maven compile completed'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                dir('kaddem') {
+                    echo 'Starting SonarQube analysis...'
+                    sh '''
+                        mvn sonar:sonar \
+                        -Dsonar.login=$SONAR_LOGIN \
+                        -Dsonar.password=$SONAR_PASSWORD \
+                        -Dsonar.host.url=$SONAR_HOST_URL
+                    '''
+                    echo 'SonarQube analysis completed'
+                }
+            }
+        }
+
+        stage('JUnit & Mockito Tests') {
+            steps {
+                dir('kaddem') {
+                    echo 'Running unit tests with JUnit and Mockito...'
+                    sh 'mvn test'
+                    echo 'Unit tests completed'
+                }
+            }
+        }
+
+        stage('Nexus Deployment') {
+            steps {
+                dir('kaddem') {
+                    echo 'Deploying to Nexus...'
+                    sh 'mvn deploy -DskipTests'
+                    echo 'Deployment to Nexus completed'
+                }
+            }
+        }
+        stage('Building Image') {
+            steps {
+                dir('kaddem') {
+                    script {
+                        echo 'Building Docker image...'
+                        sh 'docker build -t rihemhub/allouchirihem_kaddem:1.0.0 .'
+                    }
+                }
+            }
+        }
+        stage('Push Docker Image to DockerHub') {
+            steps {
+                script {
+                    echo 'Pushing Docker image to DockerHub...'
+                    withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS_ID, usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        sh '''
+                            docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
+                            docker push rihemhub/allouchirihem_kaddem:1.0.0
+                        '''
+                    }
+                    echo 'Docker image pushed to DockerHub successfully!'
+                }
+            }
+        }
+        stage('Deploy with Docker Compose') {
+            steps {
+                dir('kaddem') {
+                    script {
+                        echo 'Deploying application using Docker Compose...'
+                        sh 'docker-compose up -d'
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline completed.'
+        }
+        success {
+            echo 'Pipeline succeeded.'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
+    }
+}
