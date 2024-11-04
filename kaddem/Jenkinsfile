@@ -67,6 +67,7 @@ pipeline {
                 }
             }
         }
+
         stage('Building Image') {
             steps {
                 dir('kaddem') {
@@ -77,6 +78,7 @@ pipeline {
                 }
             }
         }
+
         stage('Push Docker Image to DockerHub') {
             steps {
                 script {
@@ -92,6 +94,7 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy with Docker Compose') {
             steps {
                 dir('kaddem') {
@@ -102,29 +105,28 @@ pipeline {
                 }
             }
         }
-    }
 
-    stage('Mail') {
-                steps {
-                    script {
-                        def subject = currentBuild.result == 'SUCCESS' ? "Pipeline Succeeded: ${currentBuild.fullDisplayName}" : "Pipeline Failed: ${currentBuild.fullDisplayName}"
-                        def body = currentBuild.result == 'SUCCESS' ?
-                            "The pipeline has succeeded. You can check the details at ${env.BUILD_URL}" :
-                            "The pipeline has failed. Please check the logs at ${env.BUILD_URL}"
+        stage('Mail') {
+            steps {
+                script {
+                    def subject = currentBuild.result == 'SUCCESS' ? "Pipeline Succeeded: ${currentBuild.fullDisplayName}" : "Pipeline Failed: ${currentBuild.fullDisplayName}"
+                    def body = currentBuild.result == 'SUCCESS' ?
+                        "The pipeline has succeeded. You can check the details at ${env.BUILD_URL}" :
+                        "The pipeline has failed. Please check the logs at ${env.BUILD_URL}"
 
-                        emailext(
-                            to: EMAIL_RECIPIENTS,
-                            subject: subject,
-                            body: body
-                        )
-                    }
+                    emailext(
+                        to: EMAIL_RECIPIENTS,
+                        subject: subject,
+                        body: body
+                    )
                 }
             }
         }
+    }
 
-        post {
-            always {
-                echo 'Pipeline completed.'
-            }
+    post {
+        always {
+            echo 'Pipeline completed.'
         }
     }
+}
