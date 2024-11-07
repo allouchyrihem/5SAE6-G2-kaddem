@@ -2,11 +2,10 @@ pipeline {
     agent any
 
     environment {
-        SONAR_HOST_URL = 'http://192.168.1.13:9000'
-        SONAR_LOGIN = 'admin'
-        SONAR_PASSWORD = 'Minette1+aze'
-        DOCKERHUB_CREDENTIALS_ID = 'rihem_hub' // Replace with your actual credentials ID in Jenkins
-        EMAIL_RECIPIENTS = 'rihem.allouchi@esprit.tn'
+        SONAR_URL = 'http://192.168.1.13:9000'
+        LOGIN = 'admin'
+        PASSWORD = 'Minette1+aze'
+        DOCKERHUB = 'rihem_hub'
     }
 
     stages {
@@ -39,9 +38,9 @@ pipeline {
                     echo 'Starting SonarQube analysis...'
                     sh '''
                         mvn sonar:sonar \
-                        -Dsonar.login=$SONAR_LOGIN \
-                        -Dsonar.password=$SONAR_PASSWORD \
-                        -Dsonar.host.url=$SONAR_HOST_URL
+                        -Dsonar.login=$LOGIN \
+                        -Dsonar.password=$PASSWORD \
+                        -Dsonar.host.url=SONAR_URL
                     '''
                     echo 'SonarQube analysis completed'
                 }
@@ -79,12 +78,12 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image to DockerHub') {
+        stage('Push to DockerHub') {
             steps {
                 script {
-                    echo 'Pushing Docker image to DockerHub...'
+                    echo 'Pushing to DockerHub...'
                     // Use Jenkins credentials to login to DockerHub
-                    withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS_ID, usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: DOCKERHUB, usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                         sh '''
                             docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
                             docker push rihemhub/allouchirihem_kaddem:1.0.0
