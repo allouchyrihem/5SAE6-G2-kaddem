@@ -8,14 +8,16 @@ pipeline {
     stages {
         stage('Checkout GIT') {
             steps {
-                echo 'Pulling the repository...'
-                git(
-                    branch: 'salma',
-                    url:'https://github.com/allouchyrihem/5SAE6-G2-kaddem.git'
-                )
+                dir('kaddem') {
+                    echo 'Pulling the repository...'
+                    git(
+                        branch: 'salma',
+                        url:'https://github.com/allouchyrihem/5SAE6-G2-kaddem.git'
+                    )
 
-                echo 'Latest commit information:'
-                sh 'git log -1'
+                    echo 'Latest commit information:'
+                    sh 'git log -1'
+                }
             }
         }
 
