@@ -105,61 +105,6 @@ pipeline {
                 }
             }
         }
-
-                stage('Notify Deployment + trivy reports') {
-                    steps {
-                        script {
-                            // Prepare email content with a simple table
-                            def htmlTable = """
-                            <table border="1" style="border-collapse:collapse">
-                                <tr>
-                                    <th>Service Name</th>
-                                    <th>IP Address</th>
-                                </tr>
-                                <tr>
-                                    <td>Jenkins</td>
-                                    <td>http://192.168.1.16:8080</td>
-                                </tr>
-                                <tr>
-                                    <td>SonarQube</td>
-                                    <td>http://192.168.1.16:9000</td>
-                                </tr>
-                                <tr>
-                                    <td>Nexus</td>
-                                    <td>http://192.168.1.16:8081</td>
-                                </tr>
-                                <tr>
-                                    <td>Prometheus</td>
-                                    <td>http://192.168.1.16:9090</td>
-                                </tr>
-                                <tr>
-                                    <td>Grafana</td>
-                                    <td>http://192.168.1.16:3000</td>
-                                </tr>
-                            </table>
-                            """
-
-                            // Prepare email body with HTML content
-                            def emailBody = """
-                            <h2>Deployment Successful</h2>
-                            <p>The deployment was successful! Here are the details:</p>
-                            <p>Build Number: ${currentBuild.number}</p>
-                            ${htmlTable}
-                            """
-                            sh "cat $TRIVY_OUTPUT_FILE"
-
-                            // Send the email
-                            emailext(
-                                subject: "Deployment Successful - Build #${currentBuild.number}",
-                                body: emailBody,
-                                mimeType: 'text/html',
-                                to: 'rihem.allouchi@esprit.tn',
-                                attachmentsPattern: 'trivy-output.txt '
-
-                            )
-                        }
-                    }
-                }
     }
 
     post {
