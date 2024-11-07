@@ -1,0 +1,118 @@
+pipeline {
+    agent any
+    environment {
+        SONAR_HOST_URL = 'http://192.168.1.27:9000'
+        SONAR_LOGIN = 'admin'
+        SONAR_PASSWORD = 'Admin1_sonar'
+    }
+    stages {
+        stage('Checkout GIT') {
+            steps {
+                echo 'Pulling the repository...'
+                git(
+                    branch: 'salma',
+                    url:'https://github.com/allouchyrihem/5SAE6-G2-kaddem.git'
+                )
+
+                echo 'Latest commit information:'
+                sh 'git log -1'
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                dir('kaddem') {
+                    echo 'Starting Maven compile...'
+                    sh 'mvn clean compile'
+                    echo 'Maven compile completed'
+                }
+            }
+        }
+
+        stage('Unit Tests/Mockito') {
+            steps {
+                dir('kaddem') {
+                    echo 'Running unit tests...'
+                    sh 'mvn test' // Exécute les tests unitaires JUnit et Mockito
+                    echo 'Unit tests completed'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                dir('kaddem') {
+                    echo 'Starting SonarQube analysis...'
+                    sh '''
+                        mvn sonar:sonar \
+                        -Dsonar.login=$SONAR_LOGIN \
+                        -Dsonar.password=$SONAR_PASSWORD \
+                        -Dsonar.host.url=$SONAR_HOST_URL
+                    '''
+                    echo 'SonarQube analysis completed'
+                }
+            }
+        }
+
+        stage('Publish to Nexus') {
+            steps {
+                dir('kaddem') {
+                    script {
+                        echo "Publishing the artifact to Nexus repository..."
+                        sh 'mvn deploy -Dmaven.test.skip=true --settings /usr/share/maven/conf/settings.xml'
+                    }
+                }
+            }
+         }
+        stage('Building Docker Image') {
+            steps {
+                dir('kaddem') {
+                    script {
+                        echo 'Building Docker image...'
+                        // Remplacez  par le nom correct de l'image
+                        sh 'docker build -t bdsalma/kaddem:v1.0.0 .'
+                    }
+                }
+            }
+        }
+        stage('Push to DockerHub') {
+            steps {
+                script {
+                    echo 'Pushing Docker image to DockerHub...'
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh '''
+                            docker login -u $DOCKER_USER -p $DOCKER_PASS
+                            docker tag bdsalma/kaddem:v1.0.0 $DOCKER_USER/kaddem:v1.0.0
+                            docker push $DOCKER_USER/kaddem:v1.0.0
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                dir('kaddem') {
+                    script {
+                        echo 'Deploying application using Docker Compose...'
+                        sh 'docker compose up -d'
+                    }
+                }
+            }
+        }
+
+
+    }
+
+    post {
+        always {
+            echo 'Pipeline completed.'
+        }
+        success {
+            echo 'Pipeline succeeded.'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
+    }
+}
