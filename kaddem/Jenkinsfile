@@ -33,7 +33,7 @@ pipeline {
             }
         }
 
-        /*stage('SonarQube Analysis') {
+        stage('SonarQube Analysis') {
             steps {
                 dir('kaddem') {
                     echo 'Starting SonarQube analysis...'
@@ -46,7 +46,7 @@ pipeline {
                     echo 'SonarQube analysis completed'
                 }
             }
-        }*/
+        }
 
         stage('JUnit & Mockito Tests') {
             steps {
