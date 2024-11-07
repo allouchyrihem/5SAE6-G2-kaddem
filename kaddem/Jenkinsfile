@@ -8,16 +8,14 @@ pipeline {
     stages {
         stage('Checkout GIT') {
             steps {
-                dir('kaddem') {
+                script {
                     echo 'Pulling the repository...'
-                    git(
-                        branch: 'salma',
-                        url:'https://github.com/allouchyrihem/5SAE6-G2-kaddem.git'
-                    )
-
-                    echo 'Latest commit information:'
-                    sh 'git log -1'
-                }
+                    withCredentials([string(credentialsId: 'github-token', variable: 'bdsalma')]) {
+                        // Utiliser le token GitHub pour authentification
+                        sh """
+                            git clone https://bdsalma@github.com/allouchyrihem/5SAE6-G2-kaddem.git
+                        """
+                    }
             }
         }
 
