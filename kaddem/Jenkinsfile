@@ -58,7 +58,7 @@ pipeline {
             }
         }
 
-        stage('Nexus Deployment') {
+        /*stage('Nexus Deployment') {
             steps {
                 dir('kaddem') {
                     echo 'Deploying to Nexus...'
@@ -66,7 +66,7 @@ pipeline {
                     echo 'Deployment to Nexus completed'
                 }
             }
-        }
+        }*/
 
         stage('Building Image') {
             steps {
