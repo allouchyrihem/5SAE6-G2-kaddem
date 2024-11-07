@@ -8,6 +8,7 @@ pipeline {
     stages {
         stage('Checkout GIT') {
             steps {
+            dir('kaddem') {
                 script {
                     echo 'Pulling the repository...'
                     withCredentials([string(credentialsId: 'github-token', variable: 'bdsalma')]) {
@@ -16,7 +17,7 @@ pipeline {
                             git clone https://bdsalma@github.com/allouchyrihem/5SAE6-G2-kaddem.git
                         """
                     }
-            }
+            }}
         }
 
         stage('Build with Maven') {
