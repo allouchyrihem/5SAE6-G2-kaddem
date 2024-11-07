@@ -33,7 +33,7 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+        /*stage('SonarQube Analysis') {
             steps {
                 dir('kaddem') {
                     echo 'Starting SonarQube analysis...'
@@ -46,7 +46,7 @@ pipeline {
                     echo 'SonarQube analysis completed'
                 }
             }
-        }
+        }*/
 
         stage('JUnit & Mockito Tests') {
             steps {
@@ -58,7 +58,7 @@ pipeline {
             }
         }
 
-        /*stage('Nexus Deployment') {
+        stage('Nexus Deployment') {
             steps {
                 dir('kaddem') {
                     echo 'Deploying to Nexus...'
@@ -66,7 +66,7 @@ pipeline {
                     echo 'Deployment to Nexus completed'
                 }
             }
-        }*/
+        }
 
         stage('Building Image') {
             steps {
