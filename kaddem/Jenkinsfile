@@ -32,6 +32,15 @@ pipeline {
             }
         }
 
+        stage('JUnit & Mockito Tests') {
+            steps {
+                dir('kaddem') {
+                    echo 'Running unit tests with JUnit and Mockito...'
+                    sh 'mvn test'
+                    echo 'Unit tests completed'
+                }
+            }
+        }
         stage('SonarQube Analysis') {
             steps {
                 dir('kaddem') {
@@ -47,15 +56,6 @@ pipeline {
             }
         }
 
-        stage('JUnit & Mockito Tests') {
-            steps {
-                dir('kaddem') {
-                    echo 'Running unit tests with JUnit and Mockito...'
-                    sh 'mvn test'
-                    echo 'Unit tests completed'
-                }
-            }
-        }
 
         stage('Nexus Deployment') {
             steps {
